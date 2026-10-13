@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock - Paper - Scissors - Game</title>
+    <!-- Google Fonts for crisp modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>ROCK PAPER SCISSORS</h1>
+    
+    <!--Main Game Section-->
+    <div class="choices">
+        <div class="choice" id="rock">
+            <!-- Inline SVG icons ensure crisp loading without broken local image paths -->
+            <svg viewBox="0 0 24 24" fill="#38bdf8" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19.5 9.5c0-.83-.67-1.5-1.5-1.5h-2.5V7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v1H11V5c0-.83-.67-1.5-1.5-1.5S8 4.17 8 5v3.18L6.87 7.62C6.35 7.24 5.64 7.27 5.16 7.7l-.42.39 5.86 6.84c.61.71.95 1.62.95 2.57v3.5h7c.83 0 1.5-.67 1.5-1.5V13c.83 0 1.5-.67 1.5-1.5v-2z"/>
+            </svg>
+        </div>
+        <div class="choice" id="paper">
+            <svg viewBox="0 0 24 24" fill="#c084fc" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 10h-2V3c0-.55-.45-1-1-1s-1 .45-1 1v6h-1V1.5c0-.55-.45-1-1-1s-1 .45-1 1V9h-1V2.5c0-.55-.45-1-1-1s-1 .45-1 1V10h-1V4.5c0-.55-.45-1-1-1s-1 .45-1 1V14l-2.4-2.4c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L8.5 19.3c.78.78 1.84 1.2 2.95 1.2H17c2.21 0 4-1.79 4-4v-6c0-.28-.22-.5-.5-.5z"/>
+            </svg>
+        </div>
+        <div class="choice" id="scissors">
+            <svg viewBox="0 0 24 24" fill="#f472b6" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64zM6 8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0 12c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm9.5-7.5L22 6V5h-3l-5.5 5.5 2 2z"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Score board Section-->
+    <div class="score-board">
+        <div class="score">
+            <p id="user-score">0</p>
+            <p>You</p>
+        </div>
+        <div class="score">
+            <p id="comp-score">0</p>
+            <p>Comp</p>
+        </div>
+    </div>
+
+    <!--Message Info Section-->
+    <div class="msg-container">
+        <p id="msg">Play your move</p>
+    </div>
+
+    <script>
+        // Track game scores
+        let userScore = 0;
+        let compScore = 0;
+
+        // Elements selection matching your IDs
+        const choices = document.querySelectorAll('.choice');
+        const msg = document.querySelector('#msg');
+        const userScorePara = document.querySelector('#user-score');
+        const compScorePara = document.querySelector('#comp-score');
+
+        // Generate computer's choice
+        const genCompChoice = () => {
+            const options = ['rock', 'paper', 'scissors'];
+            const randIdx = Math.floor(Math.random() * 3);
+            return options[randIdx];
+        };
+
+        // Score animation helper
+        const bumpScore = (element) => {
+            element.classList.remove('score-bump');
+            void element.offsetWidth; // Force DOM reflow
+            element.classList.add('score-bump');
+            setTimeout(() => element.classList.remove('score-bump'), 250);
+        };
+
+        // Draw Game handler
+        const drawGame = (choice) => {
+            msg.innerText = `Game was a Draw! Both chose ${choice.toUpperCase()}.`;
+            msg.className = 'draw';
+        };
+
+        // Show Winner handler
+        const showWinner = (userWin, userChoice, compChoice) => {
+            if (userWin) {
+                userScore++;
+                userScorePara.innerText = userScore;
+                bumpScore(userScorePara);
+                msg.innerText = `You win! Your ${userChoice.toUpperCase()} beats ${compChoice.toUpperCase()}.`;
+                msg.className = 'win';
+            } else {
+                compScore++;
+                compScorePara.innerText = compScore;
+                bumpScore(compScorePara);
+                msg.innerText = `You lost! ${compChoice.toUpperCase()} beats your ${userChoice.toUpperCase()}.`;
+                msg.className = 'lose';
+            }
+        };
+
+        // Main game logic execution
+        const playGame = (userChoice) => {
+            // Generate computer choice
+            const compChoice = genCompChoice();
+
+            if (userChoice === compChoice) {
+                drawGame(userChoice);
+            } else {
+                let userWin = true;
+                if (userChoice === 'rock') {
+                    // scissors, paper
+                    userWin = compChoice === 'paper' ? false : true;
+                } else if (userChoice === 'paper') {
+                    // rock, scissors
+                    userWin = compChoice === 'scissors' ? false : true;
+                } else {
+                    // rock, paper
+                    userWin = compChoice === 'rock' ? false : true;
+                }
+                showWinner(userWin, userChoice, compChoice);
+            }
+        };
+
+        // Add event listeners to choices
+        choices.forEach((choice) => {
+            choice.addEventListener('click', () => {
+                const userChoice = choice.getAttribute('id');
+                playGame(userChoice);
+            });
+        });
+    </script>
+</body>
+
+</html>
